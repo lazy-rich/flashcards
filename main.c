@@ -20,8 +20,10 @@
  * SOFTWARE.
  */
 #include <err.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <unistd.h>
 
 #include <SDL.h>
@@ -30,8 +32,15 @@
 #include "set.h"
 #include "card.h"
 
+/* range for user supplied interval in seconds */
+#define INTERVALMIN	5
+#define INTERVALMAX	60
+/* default interval in seconds*/
+#define DEFAULTINTERVAL	10
+
 static void usage(void);
 static Uint32 next_cardset_index(Uint32, void *);
+static unsigned long make_interval(char *);
 
 static void
 usage()
@@ -54,6 +63,24 @@ next_cardset_index(Uint32 interval, void *ud)
 	return interval;
 }
 
+static unsigned long
+make_interval(char *s)
+{
+	char *ep;
+	unsigned long res;
+
+	errno = 0;
+	res = strtoul(s, &ep, 10);
+	if (s[0] == '\0' || *ep != '\0')
+		errx(1, "make_interval: %s\n", s);
+	if (errno == ERANGE && res == ULONG_MAX)
+		errx(1, "make_interval: value out of range");
+	if (res < INTERVALMIN || res > INTERVALMAX)
+		errx(1, "make_interval: value out of range");
+
+	return res;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -64,12 +91,17 @@ main(int argc, char **argv)
 	SDL_Event ev;
 	struct cardset *cs;
 	SDL_TimerID scroll_timer;
+	unsigned long interval;
 
 	setpath = NULL;
 	s = NULL;
+	interval = DEFAULTINTERVAL;
 
-	while ((c = getopt (argc, argv, "s:")) != -1) {
+	while ((c = getopt (argc, argv, "s:i:")) != -1) {
 		switch (c) {
+		case 'i':
+			interval = make_interval(optarg);
+			break;
 		case 's':
 			setpath = optarg;
 			break;
@@ -114,7 +146,7 @@ main(int argc, char **argv)
 	}
 	destroy_set(s);
 
-	scroll_timer = SDL_AddTimer(5000, next_cardset_index, cs);
+	scroll_timer = SDL_AddTimer(interval * 1000, next_cardset_index, cs);
 	unsigned int want_exit = 0;
 	do {
 		while (SDL_PollEvent(&ev)) {

@@ -103,6 +103,9 @@ load_set(const char *path)
 
 	/* iterate through each entry */
 	while (archive_read_next_header(reader, &entry) == ARCHIVE_OK) {
+		/* if the entry size is zero skip as it is not image data */
+		if (archive_entry_size(entry) == 0)
+			continue;
 		struct item *tmp = make_item();
 		if (tmp == NULL) {
 			destroy_set(s);

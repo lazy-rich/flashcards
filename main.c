@@ -121,10 +121,17 @@ main(int argc, char **argv)
 			break;
 		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(display->r);
+		SDL_Rect dest;
+		dest.x = (display->width / 2) -
+			(cs->cards[cs->current]->width / 2);
+		dest.y = (display->height / 2) -
+			(cs->cards[cs->current]->height / 2);
+		dest.w = cs->cards[cs->current]->width;
+		dest.h = cs->cards[cs->current]->height;
 		SDL_RenderCopy(display->r, cs->cards[cs->current]->texture,
-				NULL, NULL);
+				NULL, &dest);
 		SDL_RenderPresent(display->r);
-		SDL_Delay(500);
+		SDL_Delay(200);
 	} while (1);
 
 	destroy_cardset(cs);

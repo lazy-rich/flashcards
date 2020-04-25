@@ -95,10 +95,13 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	destroy_set(s);
+	unsigned int want_exit = 0;
 	do {
-		/* events */
-		SDL_PollEvent(&ev);
-		if (ev.type == SDL_QUIT)
+		while (SDL_PollEvent(&ev)) {
+			if (ev.type == SDL_QUIT)
+				want_exit = 1;
+		}
+		if (want_exit == 1)
 			break;
 		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(display->r);

@@ -1,6 +1,6 @@
 flashcards: main.c set.o media.o
 	cc -Wall -Wextra main.c set.o media.o -o flashcards \
-		-larchive -lSDL2 -lm
+		-larchive -lSDL2 -lm -I/usr/include/SDL2
 set.o: set.c
 	cc -Wall -Wextra -c set.c -o set.o
 

@@ -46,6 +46,10 @@ make_cardrep(struct item *c, SDL_Renderer *r)
 		free(n);
 		return NULL;
 	}
+	n->texture_rect.x = 0;
+	n->texture_rect.y = 0;
+	n->texture_rect.w = n->width;
+	n->texture_rect.h = n->height;
 	free(img->data);
 	free(img);
 

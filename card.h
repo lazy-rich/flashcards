@@ -39,6 +39,7 @@ struct cardset {
 /* representation of a card */
 struct cardrep {
 	SDL_Texture *texture;
+	SDL_Rect texture_rect;
 	int height;
 	int width;
 	int x;

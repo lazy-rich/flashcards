@@ -89,7 +89,7 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) < 0) {
 		/* 1. images */
 		warnx("SDL_Init failed");
 		destroy_set(s);
@@ -103,6 +103,7 @@ main(int argc, char **argv)
 		destroy_set(s);
 		exit(EXIT_FAILURE);
 	}
+	SDL_SetWindowTitle(display->w, "flashcards");
 	cs = make_cardset_from_set(s, display->r);
 	if (cs == NULL) {
 		warnx("make_cardset_from_set failed");

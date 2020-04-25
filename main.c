@@ -45,7 +45,7 @@ static unsigned long make_interval(char *);
 static void
 usage()
 {
-	fprintf(stderr, "flashcards -s <setname>");
+	fprintf(stderr, "flashcards -s <setname> -i <delay interval>\n");
 	exit(EXIT_FAILURE);
 }
 

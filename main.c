@@ -19,11 +19,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <SDL.h>
+
+#include "media.h"
 #include "set.h"
+#include "card.h"
 
 static void usage(void);
 
@@ -40,6 +45,9 @@ main(int argc, char **argv)
 	int c;
 	char *setpath;
 	struct set *s;
+	struct window *display;
+	SDL_Event ev;
+	struct cardset *cs;
 
 	setpath = NULL;
 	s = NULL;
@@ -60,15 +68,47 @@ main(int argc, char **argv)
 		usage();
 
 	s = load_set(setpath);
-	if (s == NULL)
+	if (s == NULL) {
+		warnx("load_set failed with path: %s", setpath);
 		exit(EXIT_FAILURE);
+	}
 
-	printf("set name is: %s\n", s->name);
-	for (size_t i = 0; i < s->n_items; ++i) {
-		printf("item name is: %s\n", s->items[i]->name);
-		printf("item data size is: %ld\n", s->items[i]->size);
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		/* 1. images */
+		warnx("SDL_Init failed");
+		destroy_set(s);
+		exit(EXIT_FAILURE);
+	}
+	display = make_window(800, 600, SDL_WINDOW_RESIZABLE);
+	if (display == NULL) {
+		/* 1. images */
+		warnx("make_window failed");
+		SDL_Quit();
+		destroy_set(s);
+		exit(EXIT_FAILURE);
+	}
+	cs = make_cardset_from_set(s, display->r);
+	if (cs == NULL) {
+		warnx("make_cardset_from_set failed");
+		SDL_Quit();
+		destroy_set(s);
+		exit(EXIT_FAILURE);
 	}
 	destroy_set(s);
+	do {
+		/* events */
+		SDL_PollEvent(&ev);
+		if (ev.type == SDL_QUIT)
+			break;
+		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
+		SDL_RenderClear(display->r);
+		SDL_RenderCopy(display->r, cs->cards[0]->texture, NULL, NULL);
+		SDL_RenderPresent(display->r);
+		SDL_Delay(500);
+	} while (1);
+
+	destroy_cardset(cs);
+	SDL_Quit();
 
 	return 0;
 }

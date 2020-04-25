@@ -31,12 +31,27 @@
 #include "card.h"
 
 static void usage(void);
+static Uint32 next_cardset_index(Uint32, void *);
 
 static void
 usage()
 {
 	fprintf(stderr, "flashcards -s <setname>");
 	exit(EXIT_FAILURE);
+}
+
+static Uint32
+next_cardset_index(Uint32 interval, void *ud)
+{
+	struct cardset *c = ud;
+
+	if (c->current == (c->n_cards - 1)) {
+		c->current = 0;
+	} else {
+		++c->current;
+	}
+
+	return interval;
 }
 
 int
@@ -48,6 +63,7 @@ main(int argc, char **argv)
 	struct window *display;
 	SDL_Event ev;
 	struct cardset *cs;
+	SDL_TimerID scroll_timer;
 
 	setpath = NULL;
 	s = NULL;
@@ -96,6 +112,8 @@ main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 	destroy_set(s);
+
+	scroll_timer = SDL_AddTimer(5000, next_cardset_index, cs);
 	unsigned int want_exit = 0;
 	do {
 		while (SDL_PollEvent(&ev)) {

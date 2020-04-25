@@ -47,5 +47,6 @@ struct window {
 struct image *make_image_from_memory(unsigned char *, size_t);
 struct window *make_window(int, int, int);
 void destroy_window(struct window *);
+SDL_Texture *make_sdl_texture_from_image(struct image *, SDL_Renderer *);
 
 #endif /* MEDIA_H */

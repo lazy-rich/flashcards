@@ -24,6 +24,11 @@
 
 #include "media.h"
 
+#define COLOURDEPTH	24
+#define RMASK		0x000000ff
+#define GMASK		0x0000ff00
+#define BMASK		0x00ff0000
+
 static struct image *make_image(void);
 
 static struct image *
@@ -89,4 +94,25 @@ destroy_window(struct window *d)
 	SDL_DestroyRenderer(d->r);
 	SDL_DestroyWindow(d->w);
 	free(d);
+}
+
+SDL_Texture *
+make_sdl_texture_from_image(struct image *img, SDL_Renderer *r)
+{
+	SDL_Surface *surface;
+	SDL_Texture *texture;
+
+	surface = SDL_CreateRGBSurfaceFrom(img->data, img->width, img->height,
+			COLOURDEPTH, 3 * img->width, RMASK, GMASK, BMASK, 0);
+	if (surface == NULL)
+		return NULL;
+
+	texture = SDL_CreateTextureFromSurface(r, surface);
+	if (texture == NULL) {
+		SDL_FreeSurface(surface);
+		return NULL;
+	}
+	SDL_FreeSurface(surface);
+
+	return texture;
 }

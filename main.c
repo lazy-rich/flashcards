@@ -33,10 +33,10 @@
 #include "card.h"
 
 /* range for user supplied interval in seconds */
-#define INTERVALMIN	5
+#define INTERVALMIN	3
 #define INTERVALMAX	60
 /* default interval in seconds*/
-#define DEFAULTINTERVAL	10
+#define DEFAULTINTERVAL	5
 
 static void usage(void);
 static Uint32 next_cardset_index(Uint32, void *);

@@ -90,8 +90,9 @@ main(int argc, char **argv)
 	cs = make_cardset_from_set(s, display->r);
 	if (cs == NULL) {
 		warnx("make_cardset_from_set failed");
-		SDL_Quit();
+		destroy_window(display);
 		destroy_set(s);
+		SDL_Quit();
 		exit(EXIT_FAILURE);
 	}
 	destroy_set(s);
@@ -131,10 +132,11 @@ main(int argc, char **argv)
 		SDL_RenderCopy(display->r, cs->cards[cs->current]->texture,
 				NULL, &dest);
 		SDL_RenderPresent(display->r);
-		SDL_Delay(200);
+		SDL_Delay(100);
 	} while (1);
 
 	destroy_cardset(cs);
+	destroy_window(display);
 	SDL_Quit();
 
 	return 0;

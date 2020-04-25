@@ -57,7 +57,7 @@ make_image_from_memory(unsigned char *data, size_t size)
 	if (n == NULL)
 		return NULL;
 	n->data = stbi_load_from_memory(data, size, &n->width, &n->height,
-			&n->channels, 0);
+			&n->channels, STBI_rgb);
 	if (n->data == NULL) {
 		free(n);
 		return NULL;

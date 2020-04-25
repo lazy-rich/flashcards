@@ -100,12 +100,29 @@ main(int argc, char **argv)
 		while (SDL_PollEvent(&ev)) {
 			if (ev.type == SDL_QUIT)
 				want_exit = 1;
+			if (ev.type == SDL_KEYDOWN) {
+				if (ev.key.keysym.scancode ==
+						SDL_SCANCODE_RIGHT) {
+					if (cs->current == (cs->n_cards - 1))
+						cs->current = 0;
+					else
+						++cs->current;
+				}
+				if (ev.key.keysym.scancode ==
+						SDL_SCANCODE_LEFT) {
+					if (cs->current == 0)
+						cs->current = cs->n_cards - 1;
+					else
+						--cs->current;
+				}
+			}
 		}
 		if (want_exit == 1)
 			break;
 		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(display->r);
-		SDL_RenderCopy(display->r, cs->cards[0]->texture, NULL, NULL);
+		SDL_RenderCopy(display->r, cs->cards[cs->current]->texture,
+				NULL, NULL);
 		SDL_RenderPresent(display->r);
 		SDL_Delay(500);
 	} while (1);

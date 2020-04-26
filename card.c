@@ -99,3 +99,14 @@ destroy_cardset(struct cardset *d)
 	free(d->cards);
 	free(d);
 }
+
+struct cardrep *
+next_card(struct cardset *c)
+{
+	if (c->current == (c->n_cards - 1))
+		c->current = 0;
+	else
+		++c->current;
+
+	return c->cards[c->current];
+}

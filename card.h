@@ -48,5 +48,6 @@ struct cardrep {
 
 struct cardset *make_cardset_from_set(struct set *, SDL_Renderer *);
 void destroy_cardset(struct cardset *);
+struct cardrep *next_card(struct cardset *);
 
 #endif /* CARD_H */

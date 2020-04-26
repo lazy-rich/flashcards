@@ -41,6 +41,7 @@
 static void usage(void);
 static Uint32 next_card_timer(Uint32, void *);
 static unsigned long make_interval(char *);
+static SDL_Rect make_dest_rect(struct window *, struct cardrep *);
 
 static void
 usage()
@@ -84,6 +85,19 @@ make_interval(char *s)
 		errx(1, "make_interval: value out of range");
 
 	return res;
+}
+
+static SDL_Rect
+make_dest_rect(struct window *w, struct cardrep *c)
+{
+	SDL_Rect dest;
+
+	dest.x = (w->width / 2) - (c->width / 2);
+	dest.y = (w->height / 2) - (c->height / 2);
+	dest.w = c->width;
+	dest.h = c->height;
+
+	return dest;
 }
 
 int
@@ -166,11 +180,7 @@ main(int argc, char **argv)
 			break;
 		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(display->r);
-		SDL_Rect dest;
-		dest.x = (display->width / 2) - (cur->width / 2);
-		dest.y = (display->height / 2) - (cur->height / 2);
-		dest.w = cur->width;
-		dest.h = cur->height;
+		const SDL_Rect dest = make_dest_rect(display, cur);
 		SDL_RenderCopy(display->r, cur->texture, NULL, &dest);
 		SDL_RenderPresent(display->r);
 		SDL_Delay(100);

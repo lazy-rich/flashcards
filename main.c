@@ -39,7 +39,7 @@
 #define DEFAULTINTERVAL	5
 
 static void usage(void);
-static Uint32 next_cardset_index(Uint32, void *);
+static Uint32 next_card_timer(Uint32, void *);
 static unsigned long make_interval(char *);
 
 static void
@@ -50,15 +50,20 @@ usage()
 }
 
 static Uint32
-next_cardset_index(Uint32 interval, void *ud)
+next_card_timer(Uint32 interval, void *ud)
 {
-	struct cardset *c = ud;
+	SDL_Event ev;
+	SDL_UserEvent uev;
 
-	if (c->current == (c->n_cards - 1)) {
-		c->current = 0;
-	} else {
-		++c->current;
-	}
+	uev.type = SDL_USEREVENT;
+	uev.code = 1;
+	uev.data1 = NULL;
+	uev.data2 = NULL;
+
+	ev.type = SDL_USEREVENT;
+	ev.user = uev;
+
+	SDL_PushEvent(&ev);
 
 	return interval;
 }
@@ -90,6 +95,7 @@ main(int argc, char **argv)
 	struct window *display;
 	SDL_Event ev;
 	struct cardset *cs;
+	struct cardrep *cur;
 	SDL_TimerID scroll_timer;
 	unsigned long interval;
 
@@ -146,26 +152,26 @@ main(int argc, char **argv)
 	}
 	destroy_set(s);
 
-	scroll_timer = SDL_AddTimer(interval * 1000, next_cardset_index, cs);
+	scroll_timer = SDL_AddTimer(interval * 1000, next_card_timer, NULL);
 	unsigned int want_exit = 0;
+	cur = cs->cards[0];
 	do {
 		while (SDL_PollEvent(&ev)) {
 			if (ev.type == SDL_QUIT)
 				want_exit = 1;
+			if (ev.type == SDL_USEREVENT)
+				cur = next_card(cs);
 		}
 		if (want_exit == 1)
 			break;
 		SDL_SetRenderDrawColor(display->r, 0x00, 0x00, 0x00, 0x00);
 		SDL_RenderClear(display->r);
 		SDL_Rect dest;
-		dest.x = (display->width / 2) -
-			(cs->cards[cs->current]->width / 2);
-		dest.y = (display->height / 2) -
-			(cs->cards[cs->current]->height / 2);
-		dest.w = cs->cards[cs->current]->width;
-		dest.h = cs->cards[cs->current]->height;
-		SDL_RenderCopy(display->r, cs->cards[cs->current]->texture,
-				NULL, &dest);
+		dest.x = (display->width / 2) - (cur->width / 2);
+		dest.y = (display->height / 2) - (cur->height / 2);
+		dest.w = cur->width;
+		dest.h = cur->height;
+		SDL_RenderCopy(display->r, cur->texture, NULL, &dest);
 		SDL_RenderPresent(display->r);
 		SDL_Delay(100);
 	} while (1);

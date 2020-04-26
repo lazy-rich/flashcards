@@ -152,22 +152,6 @@ main(int argc, char **argv)
 		while (SDL_PollEvent(&ev)) {
 			if (ev.type == SDL_QUIT)
 				want_exit = 1;
-			if (ev.type == SDL_KEYDOWN) {
-				if (ev.key.keysym.scancode ==
-						SDL_SCANCODE_RIGHT) {
-					if (cs->current == (cs->n_cards - 1))
-						cs->current = 0;
-					else
-						++cs->current;
-				}
-				if (ev.key.keysym.scancode ==
-						SDL_SCANCODE_LEFT) {
-					if (cs->current == 0)
-						cs->current = cs->n_cards - 1;
-					else
-						--cs->current;
-				}
-			}
 		}
 		if (want_exit == 1)
 			break;
